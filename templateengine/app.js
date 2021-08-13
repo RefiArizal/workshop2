@@ -2,14 +2,48 @@ const { render } = require("ejs");
 const express = require("express");
 
 const app = express();
+const morgan = require("morgan");
 
+//3rd party middleware
+app.use(morgan("tiny"));
+
+// module layouting ejs express
 const expressLayouts = require("express-ejs-layouts");
 
+// middleware built in express
+app.use(express.json());
+
 const port = 3000;
+
+const mahasiswa = [
+    { id: 1, nama: "refi" },
+    { id: 2, nama: "azel" },
+    { id: 3, nama: "mori" },
+];
 
 // set tempalte ejs
 app.set("view engine", "ejs");
 app.use(expressLayouts);
+
+// middleware user defined
+app.use(function (req, res, next) {
+    console.log("log middleware...");
+    next();
+});
+
+// get post data mahasiswa
+app.get("/api/mhs", (req, res) => {
+    res.send(mahasiswa);
+});
+
+app.post("/api/mhs", (req, res) => {
+    const datamahasiswa = {
+        id: mahasiswa.length + 1,
+        nama: req.body.nama,
+    };
+    mahasiswa.push(datamahasiswa);
+    res.send(datamahasiswa);
+});
 
 app.get("/", (req, res) => {
     //     res.send("hello world");
